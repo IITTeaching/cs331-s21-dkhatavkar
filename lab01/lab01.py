@@ -22,7 +22,16 @@ def captured_output():
 
 # implement this function
 def is_perfect(n):
-    pass
+    if n>0:
+      factors = []
+      for i in range(1,n):
+        if n%i==0:
+          factors.append(i)
+      total = sum(factors)
+      if n == total:
+        return True
+    
+    return False
 
 # (3 points)
 def test1():
@@ -40,7 +49,13 @@ def test1():
 
 # implement this function
 def multiples_of_3_and_5(n):
-    pass
+    vals = []
+    for i in range(1,n):
+      if i%3==0 or i%5==0:
+        vals.append(i)
+    
+    total = sum(vals)
+    return total
 
 # (3 points)
 def test2():
@@ -53,7 +68,15 @@ def test2():
 # EXERCISE 3
 #################################################################################
 def integer_right_triangles(p):
-    pass
+    total_triangles = 0
+    for a in range(1,p-1):
+      for b in range(1,p-a):
+          c = p-a-b
+          if a**2+b**2==c**2 and a+b>c and c>a and c>b:
+            total_triangles+=1
+    
+    total_triangles = total_triangles//2
+    return total_triangles
 
 def test3():
     tc = unittest.TestCase()
@@ -67,7 +90,20 @@ def test3():
 
 # implement this function
 def gen_pattern(chars):
-    pass
+    num_rows = (len(chars)*2)-1
+    row_len = (len(chars)*4)-3
+    reversed_chars = chars[::-1]
+    counter = 1 
+    for i in range(1, num_rows+1):
+      str = reversed_chars[0:counter] + reversed_chars[0:counter-1][::-1]
+      str = ".".join(str)
+      str = str.center(row_len, ".")
+      print(str)
+
+      if i >= num_rows//2+1:
+        counter -= 1
+      else:
+        counter += 1
 
 def test4():
     tc = unittest.TestCase()
