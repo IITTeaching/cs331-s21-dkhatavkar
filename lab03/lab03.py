@@ -17,7 +17,17 @@ def mysort(lst: List[T], compare: Callable[[T, T], int]) -> List[T]:
     right element, 1 if the left is larger than the right, and 0 if the two
     elements are equal.
     """
-    pass
+    for i in range(len(lst)):
+      currentVal = lst[i]
+      minVal = currentVal
+      minValPos = i
+      for j in range(i+1,len(lst)):
+        if compare(lst[j],lst[minValPos])==-1:
+          minVal = lst[j]
+          minValPos = j
+      lst[i], lst[minValPos] = minVal, currentVal
+    
+    return lst
 
 def mybinsearch(lst: List[T], elem: S, compare: Callable[[T, S], int]) -> int:
     """
@@ -27,7 +37,28 @@ def mybinsearch(lst: List[T], elem: S, compare: Callable[[T, S], int]) -> int:
     position of the first (leftmost) match for elem in lst. If elem does not
     exist in lst, then return -1.
     """
-    pass
+    start_pos = 0
+    end_pos = len(lst)-1
+    index_pos = -1
+    while start_pos <= end_pos:
+      mid_pos = (start_pos+end_pos)//2
+      if compare(lst[mid_pos], elem) == 0:
+        index_pos = mid_pos
+        break
+      elif compare(lst[mid_pos], elem) == 1:
+        end_pos = mid_pos-1
+      else:
+        start_pos = mid_pos+1
+    
+    val = lst[index_pos]
+    count_vals = lst.count(val)
+    for i in range(count_vals):
+      if lst[index_pos-1] == val:
+        index_pos = index_pos-1
+      else:
+        break
+    
+    return index_pos
 
 class Student():
     """Custom class to test generic sorting and searching."""
@@ -112,7 +143,16 @@ class PrefixSearcher():
         Initializes a prefix searcher using a document and a maximum
         search string length k.
         """
-        pass
+        substring_lst= []
+        compare = lambda a,b: 0 if a == b else (-1 if a < b else 1)
+        for i in range(len(document)):
+          if i+k <= len(document):
+            substring_lst.append(document[i:i+k])
+          else:
+            substring_lst.append(document[i:])
+        substring_lst = mysort(substring_lst,compare)
+        self.k = k
+        self.substring_lst = substring_lst
 
     def search(self, q):
         """
@@ -121,7 +161,12 @@ class PrefixSearcher():
         length up to n). If q is longer than n, then raise an
         Exception.
         """
-        pass
+        if len(q) > self.k:
+          raise Exception("q is longer than n")
+        
+        compare = lambda a,b: 0 if a[:len(b)] == b else (-1 if a < b else 1)
+        ans =  mybinsearch(self.substring_lst, q, compare) >= 0
+        return ans
 
 # 30 Points
 def test2():
@@ -163,20 +208,40 @@ class SuffixArray():
         """
         Creates a suffix array for document (a string).
         """
-        pass
+        suffix_array = []
+        for i in range(len(document)):
+          suffix_array.append(document[i:])
+
+        compare = lambda a,b: 0 if a==b else 1 if a>b else -1
+        suffix_array = mysort(suffix_array, compare)
+        for i in range(len(suffix_array)):
+          suffix_array[i] = len(document) - len(suffix_array[i])
+
+        self.document = document
+        self.suffix_array = suffix_array
 
 
     def positions(self, searchstr: str):
         """
         Returns all the positions of searchstr in the documented indexed by the suffix array.
         """
-        pass
+        compare = lambda a,b: 0 if self.document[a:][:len(b)] == b else 1 if self.document[a:] > b else -1
+        suffix_array_copy = self.suffix_array.copy()
+        result_lst = []
+        index = mybinsearch(suffix_array_copy, searchstr, compare) 
+        while index >= 0:
+            result_lst.append(index)
+            suffix_array_copy[index] = None
+            index = mybinsearch(suffix_array_copy, searchstr, compare)
+        
+        return result_lst
 
     def contains(self, searchstr: str):
         """
         Returns true of searchstr is coontained in document.
         """
-        pass
+        compare = lambda a,b: 0 if self.document[a:][:len(b)] == b else 1 if self.document[a:] > b else -1
+        return mybinsearch(self.suffix_array, searchstr, compare) >= 0
 
 # 40 Points
 def test3():
