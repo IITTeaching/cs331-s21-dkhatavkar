@@ -191,7 +191,7 @@ class ArrayList:
         """Returns True if this ArrayList contains the same elements (in order) as
         other. If other is not an ArrayList, returns False."""
         ### BEGIN SOLUTION
-        if not isinstance(other, ArrayList):
+        if not isinstance(other, ArrayList) or (self.len != other.len):
           return False
 
         for i in range(self.len):
@@ -225,7 +225,7 @@ class ArrayList:
         ### BEGIN SOLUTION
         min = self.data[0]
         for i in range(self.len):
-          if self.data[i] < max:
+          if self.data[i] < min:
             min = self.data[i]
         
         return min
@@ -248,9 +248,14 @@ class ArrayList:
         specified, search through the end of the list for value. If value
         is not in the list, raise a ValueError."""
         ### BEGIN SOLUTION
-        for index in range(i,j):
+        if j == None:
+          j = self.len
+
+        ni = self._normalize_idx(i)
+        nj = self._normalize_idx(j)
+        for index in range(ni,nj):
           if self.data[index] == value:
-            return index
+            return index 
         
         raise ValueError()
         ### END SOLUTION
@@ -274,17 +279,16 @@ class ArrayList:
         instance that contains the values in this list followed by those
         of other."""
         ### BEGIN SOLUTION
-        if self.len + other.len > len(self):
-          factor = ((self.len + other.len)//len(self)) + 1
-          newConstrainedList = ConstrainedList(self.len*factor)
-          for i in range(self.len):
-              newConstrainedList[i] = self.data[i]
-          self.data = newConstrainedList
-        
+        newArrayList = ArrayList(self.len + other.len)
+        for i in range(self.len):
+          newArrayList[i] = self.data[i]
+          
         counter = 0
         for i in range(self.len,self.len+other.len):
-          self.data[i] = other[counter]
+          newArrayList[i] = other[counter]
           counter += 1
+        
+        return newArrayList
         ### END SOLUTION
 
     def clear(self):
@@ -295,7 +299,7 @@ class ArrayList:
         """Returns a new ArrayList instance (with a separate data store), that
         contains the same values as this list."""
         ### BEGIN SOLUTION
-        newLst = ConstrainedList(len(self.list))
+        newLst = ArrayList(len(self))
         for i in range(self.len):
           newLst[i] = self.data[i]
         
@@ -305,17 +309,8 @@ class ArrayList:
     def extend(self, other):
         """Adds all elements, in order, from other --- an Iterable --- to this list."""
         ### BEGIN SOLUTION
-        if self.len + other.len > len(self):
-          factor = ((self.len + other.len)//len(self)) + 1
-          newConstrainedList = ConstrainedList(self.len*factor)
-          for i in range(self.len):
-              newConstrainedList[i] = self.data[i]
-          self.data = newConstrainedList
-        
-        counter = 0
-        for i in range(self.len,self.len+other.len):
-          self.data[i] = other[counter]
-          counter += 1
+        for i in other:
+          self.append(i)
         ### END SOLUTION
 
 
@@ -325,7 +320,7 @@ class ArrayList:
         """Supports iteration (via `iter(self)`)"""
         ### BEGIN SOLUTION
         for i in range(self.len):
-          yield self.data[n]
+          yield self.data[i]
         ### END SOLUTION
 
 ################################################################################
